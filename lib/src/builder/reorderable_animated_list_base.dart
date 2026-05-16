@@ -1,7 +1,8 @@
+import 'package:animated_reorderable_list/animated_reorderable_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:animated_reorderable_list/animated_reorderable_list.dart';
 import 'package:flutter/material.dart';
+
 import 'reorderable_animated_builder.dart';
 
 typedef ItemBuilder<W extends Widget, E> = Widget Function(
@@ -15,6 +16,9 @@ typedef EqualityChecker<E> = bool Function(E, E);
 const Duration kAnimationDuration = Duration(milliseconds: 300);
 const Duration kDefaultDragStartDelay = Duration(milliseconds: 500);
 
+const Duration kProxyAnimationDuration = Duration(milliseconds: 250);
+const Curve kSettleCurve = Curves.easeOut;
+
 abstract class ReorderableAnimatedListBase<W extends Widget, E extends Object>
     extends StatefulWidget {
   final ItemBuilder<W, E>? itemBuilder;
@@ -23,6 +27,9 @@ abstract class ReorderableAnimatedListBase<W extends Widget, E extends Object>
   final void Function(int)? onReorderStart;
   final void Function(int)? onReorderEnd;
   final ReorderItemProxyDecorator? proxyDecorator;
+  final Duration? proxyDuration;
+  final Duration? reverseProxyDuration;
+  final Curve? settleCurve;
   final List<AnimationEffect>? enterTransition;
   final List<AnimationEffect>? exitTransition;
   final Duration? insertDuration;
@@ -48,6 +55,9 @@ abstract class ReorderableAnimatedListBase<W extends Widget, E extends Object>
       this.onReorderEnd,
       this.onReorderStart,
       this.proxyDecorator,
+      this.proxyDuration,
+      this.reverseProxyDuration,
+      this.settleCurve,
       this.enterTransition,
       this.exitTransition,
       this.insertDuration,
@@ -116,6 +126,19 @@ abstract class ReorderableAnimatedListBaseState<
   @nonVirtual
   @protected
   ReorderItemProxyDecorator? get proxyDecorator => widget.proxyDecorator;
+
+  @nonVirtual
+  @protected
+  Duration get proxyDuration => widget.proxyDuration ?? kProxyAnimationDuration;
+
+  @nonVirtual
+  @protected
+  Duration get reverseProxyDuration =>
+      widget.reverseProxyDuration ?? kProxyAnimationDuration;
+
+  @nonVirtual
+  @protected
+  Curve get settleCurve => widget.settleCurve ?? kSettleCurve;
 
   @nonVirtual
   @protected
