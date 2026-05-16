@@ -3,7 +3,6 @@ import 'package:flutter/gestures.dart';
 
 import '../../animated_reorderable_list.dart';
 import 'builder/reorderable_animated_list_base.dart';
-import 'builder/reorderable_animated_list_impl.dart';
 
 /// @docImport 'animated_reorderable_listview';
 
@@ -210,6 +209,18 @@ class AnimatedReorderableGridView<E extends Object> extends StatefulWidget {
   /// {@endtemplate}
   final ReorderItemProxyDecorator? proxyDecorator;
 
+  /// Duration of the animation while the item is being dragged.
+  /// Controls how quickly the proxy "lifts" into its floating state.
+  final Duration? proxyDuration;
+
+  /// Duration of the animation when the drag ends and the proxy returns.
+  /// Applied to the reverse animation after releasing the item.
+  final Duration? reverseProxyDuration;
+
+  /// Curve used when the dragged item settles into its final position.
+  /// Affects the interpolation toward the drop target after release.
+  final Curve? settleCurve;
+
   /// The axis along which the scroll view scrolls.
   ///
   /// Defaults to [Axis.vertical].
@@ -348,14 +359,14 @@ class AnimatedReorderableGridView<E extends Object> extends StatefulWidget {
   final bool enableSwap;
 
   /// Whether to add a [ReorderableGridDragStartListener] to the reorderable ItemBuilder.
-  /// 
+  ///
   /// Defaults to true.
-  /// 
+  ///
   /// If set to false, the items in ItemBuilder will not respond to pointer down events,
   /// which means they won't be draggable. This can be useful if you still want to
   /// receive item pointer events, and add your custom drag start listener
   /// to the item widget.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// ReorderableGridDragStartListener(
@@ -382,6 +393,9 @@ class AnimatedReorderableGridView<E extends Object> extends StatefulWidget {
       this.onReorderStart,
       this.onReorderEnd,
       this.proxyDecorator,
+      this.proxyDuration,
+      this.reverseProxyDuration,
+      this.settleCurve,
       this.padding,
       this.scrollDirection = Axis.vertical,
       this.reverse = false,
