@@ -12,6 +12,9 @@ class _DragInfo extends Drag {
   final _DragItemCallback? onCancel;
   final VoidCallback? onDragCompleted;
   final ReorderItemProxyDecorator? proxyDecorator;
+  final Duration proxyDuration;
+  final Duration reverseProxyDuration;
+  final Curve settleCurve;
   final TickerProvider tickerProvider;
 
   late ReorderableAnimatedBuilderState listState;
@@ -35,6 +38,9 @@ class _DragInfo extends Drag {
     this.onCancel,
     this.onDragCompleted,
     this.proxyDecorator,
+    this.proxyDuration = const Duration(milliseconds: 250),
+    this.reverseProxyDuration = const Duration(milliseconds: 250),
+    this.settleCurve = Curves.easeOut,
     required this.tickerProvider,
   }) {
     final RenderBox itemRenderBox =
@@ -56,7 +62,9 @@ class _DragInfo extends Drag {
 
   void startDrag() {
     _proxyAnimation = AnimationController(
-        vsync: tickerProvider, duration: const Duration(milliseconds: 250))
+        vsync: tickerProvider,
+        duration: proxyDuration,
+        reverseDuration: reverseProxyDuration)
       ..addStatusListener((status) {
         if (status == AnimationStatus.dismissed) {
           _dropCompleted();
@@ -101,6 +109,7 @@ class _DragInfo extends Drag {
         size: itemSize,
         animation: _proxyAnimation!,
         proxyDecorator: proxyDecorator,
+        settleCurve: settleCurve,
         child: child));
   }
 }
@@ -138,15 +147,18 @@ class _DragItemProxy extends StatelessWidget {
   final Size size;
   final AnimationController animation;
   final ReorderItemProxyDecorator? proxyDecorator;
+  final Curve settleCurve;
 
-  const _DragItemProxy(
-      {required this.listState,
-      required this.index,
-      required this.child,
-      required this.position,
-      required this.size,
-      required this.animation,
-      required this.proxyDecorator});
+  const _DragItemProxy({
+    required this.listState,
+    required this.index,
+    required this.child,
+    required this.position,
+    required this.size,
+    required this.animation,
+    required this.proxyDecorator,
+    required this.settleCurve,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -161,10 +173,8 @@ class _DragItemProxy extends StatelessWidget {
             Offset effectivePosition = position;
             final Offset? dropPosition = listState._finalDropPosition;
             if (dropPosition != null) {
-              effectivePosition = Offset.lerp(
-                  dropPosition - overlayOrigin,
-                  effectivePosition,
-                  Curves.easeOut.transform(animation.value))!;
+              effectivePosition = Offset.lerp(dropPosition - overlayOrigin,
+                  effectivePosition, settleCurve.transform(animation.value))!;
             }
             return Positioned(
                 left: effectivePosition.dx,

@@ -1,15 +1,16 @@
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import '../component/sliver_constraints_capture.dart';
+
 import '../component/drag_listener.dart';
+import '../component/sliver_constraints_capture.dart';
 import '../model/item_transition_data.dart';
 import 'reorderable_animated_list_base.dart';
 
 part '../component/drag_item.dart';
-
 part '../component/reorderable_animated_content.dart';
 
 typedef CustomAnimatedWidgetBuilder<E> = Widget Function(
@@ -23,6 +24,9 @@ class ReorderableAnimatedBuilder<E> extends StatefulWidget {
   final void Function(int index)? onReorderEnd;
 
   final ReorderItemProxyDecorator? proxyDecorator;
+  final Duration proxyDuration;
+  final Duration reverseProxyDuration;
+  final Curve settleCurve;
   final ItemBuilder itemBuilder;
   final int initialCount;
   final Axis scrollDirection;
@@ -43,6 +47,9 @@ class ReorderableAnimatedBuilder<E> extends StatefulWidget {
       this.onReorderEnd,
       this.onReorderStart,
       this.proxyDecorator,
+      this.proxyDuration = const Duration(milliseconds: 250),
+      this.reverseProxyDuration = const Duration(milliseconds: 250),
+      this.settleCurve = Curves.easeOut,
       this.initialCount = 0,
       this.delegateBuilder,
       this.scrollDirection = Axis.vertical,
@@ -186,6 +193,9 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
         onEnd: _dragEnd,
         onDragCompleted: _dropCompleted,
         proxyDecorator: widget.proxyDecorator,
+        proxyDuration: widget.proxyDuration,
+        reverseProxyDuration: widget.reverseProxyDuration,
+        settleCurve: widget.settleCurve,
         tickerProvider: this);
 
     _dragInfo!.startDrag();
